@@ -31,7 +31,15 @@ module.exports = function (config) {
       reporters: [
         { type: 'html' },
         { type: 'text-summary' }
-      ]
+      ],
+      check: {
+        global: {
+          statement: 30,
+          branches: 30,
+          functions: 30,
+          lines: 30
+        }
+      }
     },
     reporters: ['mocha'],
     port: 9876,
