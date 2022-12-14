@@ -10,7 +10,7 @@ import { TokenInterceptor } from '../interceptors/token.interceptor';
 import { TokenService } from './token.service';
 
 //Le ponemos una f antes de la prueba para que se enfoque en solo esta
-fdescribe('ProductsService', () => {
+describe('ProductsService', () => {
 
   //Esto es como la inyección de dependecias
   let productService: ProductsService;
