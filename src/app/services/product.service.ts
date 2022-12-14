@@ -17,7 +17,7 @@ export class ProductsService {
     private http: HttpClient
   ) { }
 
-  getAllSimple(){
+  getAllSimple() {
     return this.http.get<Product[]>(`${this.apiUrl}/products`)
   }
 
@@ -28,15 +28,15 @@ export class ProductsService {
       params = params.set('offset', offset);
     }
     return this.http.get<Product[]>(`${this.apiUrl}/products`, { params })
-    .pipe(
-      retry(3),
-      map(products => products.map(item => {
-        return {
-          ...item,
-          taxes: item.price > 0 ? .19 * item.price : 0
-        }
-      }))
-    );
+      .pipe(
+        retry(3),
+        map(products => products.map(item => {
+          return {
+            ...item,
+            taxes: item.price > 0 ? .19 * item.price : 0
+          }
+        }))
+      );
   }
 
   fetchReadAndUpdate(id: string, dto: UpdateProductDTO) {
@@ -48,24 +48,25 @@ export class ProductsService {
 
   getOne(id: string) {
     return this.http.get<Product>(`${this.apiUrl}/${id}`)
-    .pipe(
-      catchError((error: HttpErrorResponse) => {
-        if (error.status === HttpStatusCode.Conflict) {
-          return throwError('Algo esta fallando en el server');
-        }
-        if (error.status === HttpStatusCode.NotFound) {
-          return throwError('El producto no existe');
-        }
-        if (error.status === HttpStatusCode.Unauthorized) {
-          return throwError('No estas permitido');
-        }
-        return throwError('Ups algo salio mal');
-      })
-    )
+      .pipe(
+        catchError((error: HttpErrorResponse) => {
+          if (error.status === HttpStatusCode.Conflict) {
+            return throwError(() => 'Algo esta fallando en el server');
+          }
+          if (error.status === HttpStatusCode.NotFound) {
+            return throwError(() => 'El producto no existe');
+          }
+          if (error.status === HttpStatusCode.Unauthorized) {
+            return throwError(() => 'No estas permitido');
+          }
+          return throwError(() => 'Ups algo salio mal');
+        })
+      )
   }
 
   create(dto: CreateProductDTO) {
-    return this.http.post<Product>(this.apiUrl, dto);
+    /* dto.title = 'dsfsd' */
+    return this.http.post<Product>(`${this.apiUrl}/products`, dto);
   }
 
   update(id: string, dto: UpdateProductDTO) {

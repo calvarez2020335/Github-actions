@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing'
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
 import { ProductsService } from './product.service'
-import { Product } from '../models/product.model';
+import { CreateProductDTO, Product } from '../models/product.model';
 import { generateManyProducts, generateOneProduct } from '../models/product.mock';
 import { environment } from 'src/environments/environment';
 
@@ -24,6 +24,10 @@ fdescribe('ProductsService', () => {
     productService = TestBed.inject(ProductsService);
     httpController = TestBed.inject(HttpTestingController);
   });
+
+  afterEach(() => {
+    httpController.verify();
+  })
 
   //Prueba basica para ver si el servivicio se creo con exito
   it('should be create Product Service', () => {
@@ -48,7 +52,7 @@ fdescribe('ProductsService', () => {
       const url = `${environment.API_URL}/api/v1/products`
       const req = httpController.expectOne(url);
       req.flush(mockData);
-      httpController.verify();
+  
 
     })
   })
@@ -70,7 +74,7 @@ fdescribe('ProductsService', () => {
       const url = `${environment.API_URL}/api/v1/products`;
       const req = httpController.expectOne(url);
       req.flush(mockData);
-      httpController.verify();
+      
     });
 
     ////////////////////////////////////////////////////////////////////
@@ -111,7 +115,7 @@ fdescribe('ProductsService', () => {
       const url = `${environment.API_URL}/api/v1/products`;
       const req = httpController.expectOne(url);
       req.flush(mockData);
-      httpController.verify();
+      
     });
 
     ///////////////////////////////
@@ -136,12 +140,34 @@ fdescribe('ProductsService', () => {
       const params = req.request.params;
       expect(params.get('limit')).toEqual(`${limit}`);
       expect(params.get('offset')).toEqual(`${offset}`);
-      httpController.verify();
     });
-
-
   });
 
-  
+  describe('test for create', () => {
+    it('should return a new product', (doneFn) => {
+
+      //Arrange
+      const mockData = generateOneProduct();
+      const dto: CreateProductDTO = {
+        title: 'new Product',
+        price: 100,
+        images: ['img'],
+        description: 'new Product description',
+        categoryId: 12
+      }
+      //Act
+      productService.create({...dto}).subscribe( data => {
+        expect(data).toEqual(mockData);
+        //Asert
+        doneFn();
+      })
+       // http config
+       const url = `${environment.API_URL}/api/v1/products`;
+       const req = httpController.expectOne(url);
+       req.flush(mockData);
+       expect(req.request.body).toEqual(dto);
+       expect(req.request.method).toEqual('POST');
+    })
+  })
 
 })
